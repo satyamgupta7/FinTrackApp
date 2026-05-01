@@ -1,0 +1,80 @@
+export const LOANS = [
+  {
+    id: '1',
+    name: 'Loan 1',
+    total: 1007535,
+    remaining: 451551,
+    emi: 21581,
+    origTerm: 60,
+    dueTerm: 36,
+    dueDate: 'Jun 5',
+    color: '#E65100',
+  },
+  {
+    id: '2',
+    name: 'Loan 2',
+    total: 365000,
+    remaining: 194706,
+    emi: 8117,
+    origTerm: 60,
+    dueTerm: 29,
+    dueDate: 'Jun 5',
+    color: '#1565C0',
+  },
+];
+
+export type ScheduleRow = {
+  month: string;
+  loan1Os: number | null;
+  loan1Extra: number | null;
+  loan2Os: number | null;
+  totalOs: number;
+};
+
+export const SCHEDULE: ScheduleRow[] = [
+  { month: 'Opening', loan1Os: 1007535, loan1Extra: null, loan2Os: 365000, totalOs: 1372535 },
+  { month: 'May-23',  loan1Os: 994643,  loan1Extra: null, loan2Os: null,   totalOs: 994643 },
+  { month: 'Jun-23',  loan1Os: 981641,  loan1Extra: null, loan2Os: null,   totalOs: 981641 },
+  { month: 'Jul-23',  loan1Os: 968527,  loan1Extra: null, loan2Os: null,   totalOs: 968527 },
+  { month: 'Aug-23',  loan1Os: 955299,  loan1Extra: null, loan2Os: null,   totalOs: 955299 },
+  { month: 'Sep-23',  loan1Os: 941957,  loan1Extra: null, loan2Os: null,   totalOs: 941957 },
+  { month: 'Oct-23',  loan1Os: 928501,  loan1Extra: null, loan2Os: null,   totalOs: 928501 },
+  { month: 'Nov-23',  loan1Os: 914928,  loan1Extra: null, loan2Os: null,   totalOs: 914928 },
+  { month: 'Dec-23',  loan1Os: 901238,  loan1Extra: null, loan2Os: null,   totalOs: 901238 },
+  { month: 'Jan-24',  loan1Os: 887430,  loan1Extra: null, loan2Os: 365000, totalOs: 1252430 },
+  { month: 'Feb-24',  loan1Os: 873503,  loan1Extra: null, loan2Os: 360000, totalOs: 1233503 },
+  { month: 'Mar-24',  loan1Os: 859456,  loan1Extra: null, loan2Os: 355000, totalOs: 1214456 },
+  { month: 'Apr-24',  loan1Os: 845287,  loan1Extra: null, loan2Os: 350000, totalOs: 1195287 },
+  { month: 'May-24',  loan1Os: 830997,  loan1Extra: null, loan2Os: 345000, totalOs: 1175997 },
+  { month: 'Jun-24',  loan1Os: 816583,  loan1Extra: null, loan2Os: 340000, totalOs: 1156583 },
+  { month: 'Jul-24',  loan1Os: 802045,  loan1Extra: null, loan2Os: 335000, totalOs: 1137045 },
+  { month: 'Aug-24',  loan1Os: 787381,  loan1Extra: null, loan2Os: 330000, totalOs: 1117381 },
+  { month: 'Sep-24',  loan1Os: 772592,  loan1Extra: null, loan2Os: 325000, totalOs: 1097592 },
+  { month: 'Oct-24',  loan1Os: 757674,  loan1Extra: null, loan2Os: 320000, totalOs: 1077674 },
+  { month: 'Nov-24',  loan1Os: 742628,  loan1Extra: 50000, loan2Os: 275000, totalOs: 1067628 },
+  { month: 'Dec-24',  loan1Os: 727452,  loan1Extra: null, loan2Os: 280000, totalOs: 1007452 },
+  { month: 'Jan-25',  loan1Os: 712145,  loan1Extra: null, loan2Os: 285513, totalOs: 997658 },
+  { month: 'Feb-25',  loan1Os: 696706,  loan1Extra: null, loan2Os: 279661, totalOs: 976367 },
+  { month: 'Mar-25',  loan1Os: 681134,  loan1Extra: null, loan2Os: 274338, totalOs: 955472 },
+  { month: 'Apr-25',  loan1Os: 665428,  loan1Extra: null, loan2Os: 268962, totalOs: 934390 },
+  { month: 'May-25',  loan1Os: 649586,  loan1Extra: null, loan2Os: 263532, totalOs: 913118 },
+  { month: 'Jun-25',  loan1Os: 633608,  loan1Extra: null, loan2Os: 258048, totalOs: 891656 },
+  { month: 'Jul-25',  loan1Os: 617491,  loan1Extra: null, loan2Os: 252509, totalOs: 870000 },
+  { month: 'Aug-25',  loan1Os: 601236,  loan1Extra: null, loan2Os: 246915, totalOs: 848151 },
+  { month: 'Sep-25',  loan1Os: 584841,  loan1Extra: null, loan2Os: 241265, totalOs: 826106 },
+  { month: 'Oct-25',  loan1Os: 568304,  loan1Extra: null, loan2Os: 235559, totalOs: 803863 },
+  { month: 'Nov-25',  loan1Os: 551625,  loan1Extra: null, loan2Os: 229796, totalOs: 781421 },
+  { month: 'Dec-25',  loan1Os: 534946,  loan1Extra: null, loan2Os: 223975, totalOs: 758921 },
+  { month: 'Jan-26',  loan1Os: 518267,  loan1Extra: null, loan2Os: 218096, totalOs: 736363 },
+  { month: 'Feb-26',  loan1Os: 501588,  loan1Extra: null, loan2Os: 212158, totalOs: 713746 },
+  { month: 'Mar-26',  loan1Os: 484909,  loan1Extra: null, loan2Os: 206406, totalOs: 691315 },
+  { month: 'Apr-26',  loan1Os: 468230,  loan1Extra: null, loan2Os: 200104, totalOs: 668334 },
+  { month: 'May-26',  loan1Os: 451551,  loan1Extra: null, loan2Os: 194706, totalOs: 646257 },
+  { month: 'Jun-26',  loan1Os: 434872,  loan1Extra: null, loan2Os: 188856, totalOs: 623728 },
+  { month: 'Jul-26',  loan1Os: 418193,  loan1Extra: null, loan2Os: 183006, totalOs: 601199 },
+  { month: 'Aug-26',  loan1Os: 401514,  loan1Extra: null, loan2Os: 177156, totalOs: 578670 },
+  { month: 'Sep-26',  loan1Os: 384835,  loan1Extra: null, loan2Os: 171306, totalOs: 556141 },
+  { month: 'Oct-26',  loan1Os: 368156,  loan1Extra: null, loan2Os: 165456, totalOs: 533612 },
+  { month: 'Nov-26',  loan1Os: 351477,  loan1Extra: null, loan2Os: 159606, totalOs: 511083 },
+  { month: 'Dec-26',  loan1Os: 334798,  loan1Extra: null, loan2Os: 153756, totalOs: 488554 },
+];
