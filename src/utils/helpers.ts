@@ -1,4 +1,4 @@
-import { CURRENCY } from '@/src/config/constants';
+import { CURRENCY } from '@/src/config/common.constants';
 
 export function getGreeting(firstName: string): string {
   const hour = new Date().getHours();
@@ -8,5 +8,7 @@ export function getGreeting(firstName: string): string {
 }
 
 export function formatINR(amount: number): string {
-  return `${CURRENCY}${amount.toLocaleString('en-IN')}`;
+  const abs = Math.abs(amount);
+  const formatted = `${CURRENCY}${abs.toLocaleString('en-IN')}`;
+  return amount < 0 ? `-${formatted}` : formatted;
 }

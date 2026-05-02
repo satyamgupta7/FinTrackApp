@@ -1,18 +1,14 @@
-import { Colors } from '@/src/config/theme';
-import { useColorScheme } from '@/src/hooks/use-color-scheme';
-import { useAuth, useUser } from '@clerk/clerk-expo';
+import { useTheme } from '@/src/hooks/useTheme';
+import { useUser } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function ProfileScreen() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-  const s = styles(colors);
+  const { colors, styles: g } = useTheme();
   const router = useRouter();
   const { user } = useUser();
-  const { signOut } = useAuth();
 
   const firstName = user?.firstName ?? '';
   const lastName  = user?.lastName ?? '';
@@ -36,65 +32,41 @@ export default function ProfileScreen() {
   }
 
   return (
-    <ScrollView style={s.container} contentContainerStyle={{ padding: 20 }}>
-      <TouchableOpacity style={s.back} onPress={() => router.back()}>
+    <ScrollView style={g.container} contentContainerStyle={g.scrollContent20}>
+      <TouchableOpacity style={g.backLg} onPress={() => router.back()}>
         <Ionicons name="arrow-back" size={22} color={colors.text} />
       </TouchableOpacity>
-
-      <View style={s.avatarBox}>
-        <View style={s.avatar}><Text style={s.avatarText}>{initials}</Text></View>
-        <Text style={s.name}>{firstName} {lastName}</Text>
-        <Text style={s.email}>{email}</Text>
+      <View style={g.avatarBox}>
+        <View style={g.avatarLg}><Text style={g.avatarTextLg}>{initials}</Text></View>
+        <Text style={g.userName}>{firstName} {lastName}</Text>
+        <Text style={g.metaText}>{email}</Text>
       </View>
-
-      <View style={s.card}>
-        <Text style={s.sectionTitle}>Personal Information</Text>
-
-        <Text style={s.label}>First Name</Text>
-        <TextInput style={s.input} value={editFirst} onChangeText={setEditFirst} placeholderTextColor={colors.icon} />
-
-        <Text style={s.label}>Last Name</Text>
-        <TextInput style={s.input} value={editLast} onChangeText={setEditLast} placeholderTextColor={colors.icon} />
-
-        <Text style={s.label}>Email Address</Text>
-        <TextInput style={[s.input, s.inputDisabled]} value={email} editable={false} />
-
-        <TouchableOpacity style={[s.btn, saving && { opacity: 0.6 }]} onPress={handleSave} disabled={saving}>
-          <Text style={s.btnText}>{saving ? 'Saving...' : 'Save Changes'}</Text>
+      <View style={g.card}>
+        <Text style={g.sectionTitleSm}>Personal Information</Text>
+        <Text style={g.label}>First Name</Text>
+        <TextInput style={g.input} value={editFirst} onChangeText={setEditFirst} placeholderTextColor={colors.icon} />
+        <Text style={g.label}>Last Name</Text>
+        <TextInput style={g.input} value={editLast} onChangeText={setEditLast} placeholderTextColor={colors.icon} />
+        <Text style={g.label}>Email Address</Text>
+        <TextInput style={[g.input, g.inputDisabled]} value={email} editable={false} />
+        <TouchableOpacity style={[g.btn, saving && g.btnDisabled, { marginTop: 20 }]} onPress={handleSave} disabled={saving}>
+          <Text style={g.btnText}>{saving ? 'Saving...' : 'Save Changes'}</Text>
         </TouchableOpacity>
       </View>
-
-      <View style={s.card}>
-        <Text style={s.sectionTitle}>Account</Text>
-        <View style={s.infoRow}>
+      <View style={g.card}>
+        <Text style={g.sectionTitleSm}>Account</Text>
+        <View style={g.infoRow}>
           <Ionicons name="mail-outline" size={18} color={colors.icon} />
-          <Text style={s.infoText}>Email verified</Text>
+          <Text style={g.infoText}>Email verified</Text>
           <Ionicons name="checkmark-circle" size={18} color={colors.income} />
         </View>
-        <View style={[s.infoRow, { borderBottomWidth: 0 }]}>
+        <View style={[g.infoRow, { borderBottomWidth: 0 }]}>
           <Ionicons name="calendar-outline" size={18} color={colors.icon} />
-          <Text style={s.infoText}>Member since {new Date(user?.createdAt ?? Date.now()).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}</Text>
+          <Text style={g.infoText}>
+            Member since {new Date(user?.createdAt ?? Date.now()).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
+          </Text>
         </View>
       </View>
     </ScrollView>
   );
 }
-
-const styles = (colors: typeof Colors.light) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  back: { marginBottom: 16 },
-  avatarBox: { alignItems: 'center', marginBottom: 24 },
-  avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.tint, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  avatarText: { color: '#fff', fontSize: 28, fontWeight: '800' },
-  name: { fontSize: 20, fontWeight: '800', color: colors.text },
-  email: { fontSize: 13, color: colors.icon, marginTop: 4 },
-  card: { backgroundColor: colors.card, borderRadius: 16, padding: 20, marginBottom: 16, elevation: 1 },
-  sectionTitle: { fontSize: 15, fontWeight: '700', color: colors.text, marginBottom: 16 },
-  label: { fontSize: 12, color: colors.icon, marginBottom: 4, marginTop: 12 },
-  input: { backgroundColor: colors.background, borderRadius: 10, padding: 12, fontSize: 14, color: colors.text, borderWidth: 1, borderColor: colors.border },
-  inputDisabled: { opacity: 0.5 },
-  btn: { backgroundColor: colors.tint, borderRadius: 12, padding: 14, alignItems: 'center', marginTop: 20 },
-  btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
-  infoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border },
-  infoText: { flex: 1, fontSize: 14, color: colors.text },
-});

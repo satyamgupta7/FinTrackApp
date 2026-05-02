@@ -1,4 +1,4 @@
-import { USER } from '@/src/config/constants';
+import { OWNER_CLERK_ID } from '@/src/config/common.constants';
 import { LOANS } from '@/src/config/loanData';
 import { EXPENSE_DATA, YearData } from '@/src/config/expenseData';
 import { DEFAULT_NEW_USER_LOANS, DEFAULT_NEW_USER_SAVINGS, DEFAULT_NEW_USER_EXPENSES } from '@/src/config/defaultData';
@@ -53,8 +53,8 @@ export const SYSTEM_CATEGORIES: Category[] = [
 ];
 
 export const DEFAULT_SAVINGS: SavingGoal[] = [
-  { id: 'default-1', name: 'Emergency Fund', target: 300000, saved: 0,      color: '#1565C0' },
-  { id: 'default-2', name: 'Mutual Fund',    target: 150000, saved: 0,      color: '#6A1B9A' },
+  { id: 'default-1', name: 'Emergency Fund', target: 300000, saved: 0, color: '#1565C0' },
+  { id: 'default-2', name: 'Mutual Fund',    target: 150000, saved: 0, color: '#6A1B9A' },
 ];
 
 const OWNER_SAVINGS: SavingGoal[] = [
@@ -82,14 +82,15 @@ const FinanceContext = createContext<FinanceStore | null>(null);
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const { userId } = useAuth();
-  const [savings, setSavingsState]     = useState<SavingGoal[]>(DEFAULT_SAVINGS);
-  const [loans, setLoansState]         = useState<Loan[]>(LOANS);
+  const [savings, setSavingsState]         = useState<SavingGoal[]>(DEFAULT_SAVINGS);
+  const [loans, setLoansState]             = useState<Loan[]>(LOANS);
   const [expenseData, setExpenseDataState] = useState<YearData[]>(EXPENSE_DATA);
-  const [categories, setCategories]    = useState<Category[]>(SYSTEM_CATEGORIES);
-  const [loading, setLoading]          = useState(true);
+  const [categories, setCategories]        = useState<Category[]>(SYSTEM_CATEGORIES);
+  const [loading, setLoading]              = useState(true);
 
   useEffect(() => {
     if (!userId) return;
+    let cancelled = false;
     (async () => {
       setLoading(true);
       try {
@@ -100,52 +101,49 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
           isUserInitialized(userId),
         ]);
 
+        if (cancelled) return;
+
         const hasLoans    = firestoreLoans.length > 0;
         const hasSavings  = firestoreSavings.length > 0;
-        const hasExpenses = firestoreExpenses && (firestoreExpenses as any[]).length > 0;
+        const hasExpenses = firestoreExpenses != null && firestoreExpenses.length > 0;
 
-        console.log('=== FIRESTORE LOAD ===');
-        console.log('userId:', userId);
-        console.log('initialized:', initialized);
-        console.log('loans:', firestoreLoans.length, JSON.stringify(firestoreLoans));
-        console.log('savings:', firestoreSavings.length, JSON.stringify(firestoreSavings));
-        console.log('expenses:', hasExpenses, firestoreExpenses);
-        console.log('======================');
+        if (hasLoans)    setLoansState(firestoreLoans);
+        if (hasSavings)  setSavingsState(firestoreSavings);
+        if (hasExpenses) setExpenseDataState(firestoreExpenses!);
 
-        // Load whatever exists in Firestore
-        if (hasLoans)    setLoansState(firestoreLoans as Loan[]);
-        if (hasSavings)  setSavingsState(firestoreSavings as SavingGoal[]);
-        if (hasExpenses) setExpenseDataState(firestoreExpenses as YearData[]);
-
-        // Seed only what's missing
         if (!initialized) {
-          const isOwner = userId === USER.clerkId;
-          const seedLoans    = isOwner ? LOANS            : DEFAULT_NEW_USER_LOANS;
-          const seedSavings  = isOwner ? OWNER_SAVINGS    : DEFAULT_NEW_USER_SAVINGS;
-          const seedExpenses = isOwner ? EXPENSE_DATA     : DEFAULT_NEW_USER_EXPENSES;
+          const isOwner    = userId === OWNER_CLERK_ID;
+          const seedLoans    = isOwner ? LOANS         : DEFAULT_NEW_USER_LOANS;
+          const seedSavings  = isOwner ? OWNER_SAVINGS : DEFAULT_NEW_USER_SAVINGS;
+          const seedExpenses = isOwner ? EXPENSE_DATA  : DEFAULT_NEW_USER_EXPENSES;
+
           await Promise.all([
             !hasLoans    && Promise.all(seedLoans.map(l => saveLoan(userId, l))),
             !hasSavings  && Promise.all(seedSavings.map(g => saveSavingGoal(userId, g))),
             !hasExpenses && saveExpenseData(userId, seedExpenses),
             markUserInitialized(userId),
           ].filter(Boolean));
+
+          if (cancelled) return;
           if (!hasLoans)    setLoansState(seedLoans);
           if (!hasSavings)  setSavingsState(seedSavings);
           if (!hasExpenses) setExpenseDataState(seedExpenses);
         }
       } catch (e) {
-        console.warn('Firestore error, using local defaults', e);
+        if (!cancelled) console.warn('Firestore error, using local defaults', e);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
+    return () => { cancelled = true; };
   }, [userId]);
 
   const addOrUpdateLoan = useCallback(async (loan: Loan) => {
-    setLoansState(prev => {
-      const exists = prev.find(l => l.id === loan.id);
-      return exists ? prev.map(l => l.id === loan.id ? loan : l) : [...prev, loan];
-    });
+    setLoansState(prev =>
+      prev.find(l => l.id === loan.id)
+        ? prev.map(l => l.id === loan.id ? loan : l)
+        : [...prev, loan]
+    );
     if (userId) await saveLoan(userId, loan);
   }, [userId]);
 
@@ -155,10 +153,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   }, [userId]);
 
   const addOrUpdateSaving = useCallback(async (goal: SavingGoal) => {
-    setSavingsState(prev => {
-      const exists = prev.find(g => g.id === goal.id);
-      return exists ? prev.map(g => g.id === goal.id ? goal : g) : [...prev, goal];
-    });
+    setSavingsState(prev =>
+      prev.find(g => g.id === goal.id)
+        ? prev.map(g => g.id === goal.id ? goal : g)
+        : [...prev, goal]
+    );
     if (userId) await saveSavingGoal(userId, goal);
   }, [userId]);
 
@@ -167,22 +166,29 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     if (userId) await deleteSavingGoal(userId, id);
   }, [userId]);
 
+  // Use functional updater + ref pattern to avoid stale closure on batch saves
   const setSavings = useCallback(async (updater: (prev: SavingGoal[]) => SavingGoal[]) => {
-    let next: SavingGoal[] = [];
-    setSavingsState(prev => { next = updater(prev); return next; });
-    if (userId) await Promise.all(next.map(g => saveSavingGoal(userId, g)));
+    if (!userId) { setSavingsState(updater); return; }
+    const next = await new Promise<SavingGoal[]>(resolve => {
+      setSavingsState(prev => { const n = updater(prev); resolve(n); return n; });
+    });
+    await Promise.all(next.map(g => saveSavingGoal(userId, g)));
   }, [userId]);
 
   const setLoans = useCallback(async (updater: (prev: Loan[]) => Loan[]) => {
-    let next: Loan[] = [];
-    setLoansState(prev => { next = updater(prev); return next; });
-    if (userId) await Promise.all(next.map(l => saveLoan(userId, l)));
+    if (!userId) { setLoansState(updater); return; }
+    const next = await new Promise<Loan[]>(resolve => {
+      setLoansState(prev => { const n = updater(prev); resolve(n); return n; });
+    });
+    await Promise.all(next.map(l => saveLoan(userId, l)));
   }, [userId]);
 
   const setExpenseData = useCallback(async (updater: (prev: YearData[]) => YearData[]) => {
-    let next: YearData[] = [];
-    setExpenseDataState(prev => { next = updater(prev); return next; });
-    if (userId) await saveExpenseData(userId, next);
+    if (!userId) { setExpenseDataState(updater); return; }
+    const next = await new Promise<YearData[]>(resolve => {
+      setExpenseDataState(prev => { const n = updater(prev); resolve(n); return n; });
+    });
+    await saveExpenseData(userId, next);
   }, [userId]);
 
   return (

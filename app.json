@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "fintackapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
@@ -18,8 +17,6 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.finTackApp"
     },
     "web": {
@@ -28,6 +25,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-secure-store",
       [
         "expo-splash-screen",
         {
@@ -39,17 +37,23 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true
+      "reactCompiler": true,
+      "newArchEnabled": true
     },
     "extra": {
       "router": {},
       "eas": {
         "projectId": "0b4ee87c-266f-47c1-8074-95330d4ff3c5"
-      }
+      },
+      "firebase": {},
+      "clerkPublishableKey": "",
+      "ownerClerkId": ""
     }
   }
 }

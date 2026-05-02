@@ -1,20 +1,18 @@
-import { tokenCache } from "@/src/services/tokenCache";
-import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
-import { Stack, useRouter, useSegments } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
-import "react-native-reanimated";
+import { tokenCache } from '@/src/services/tokenCache';
+import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import 'react-native-reanimated';
 
-import { FinanceProvider } from "@/src/context/FinanceContext";
-import { useColorScheme } from "@/src/hooks/use-color-scheme";
+import { FinanceProvider } from '@/src/context/FinanceContext';
+import { useColorScheme } from '@/src/hooks/use-color-scheme';
+import { CLERK_PUBLISHABLE_KEY, STACK_SCREENS, ROUTES } from '@/src/config/common.constants';
 
-const PUBLISHABLE_KEY =
-  "pk_test_Z29yZ2VvdXMtaGFyZS01OC5jbGVyay5hY2NvdW50cy5kZXYk";
+if (!CLERK_PUBLISHABLE_KEY) {
+  throw new Error('Missing clerkPublishableKey in app.json extra');
+}
 
 function AuthGuard() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -23,13 +21,13 @@ function AuthGuard() {
 
   useEffect(() => {
     if (!isLoaded) return;
-    const inAuth = segments[0] === "(auth)";
+    const inAuth = segments[0] === '(auth)';
     if (!isSignedIn && !inAuth) {
-      router.replace("/(auth)/sign-in");
+      router.replace(ROUTES.SIGN_IN);
     } else if (isSignedIn && inAuth) {
-      router.replace("/(tabs)/dashboard");
+      router.replace(ROUTES.DASHBOARD);
     }
-  }, [isSignedIn, isLoaded, segments]);
+  }, [isSignedIn, isLoaded, segments, router]);
 
   return null;
 }
@@ -38,24 +36,14 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} tokenCache={tokenCache}>
+    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}>
       <FinanceProvider>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <AuthGuard />
           <Stack>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="loan-detail" options={{ headerShown: false }} />
-            <Stack.Screen name="profile" options={{ headerShown: false }} />
-            <Stack.Screen name="budget-planner" options={{ headerShown: false }} />
-            <Stack.Screen name="reports" options={{ headerShown: false }} />
-            <Stack.Screen name="notifications" options={{ headerShown: false }} />
-            <Stack.Screen name="currency-settings" options={{ headerShown: false }} />
-            <Stack.Screen name="security" options={{ headerShown: false }} />
-            <Stack.Screen name="help" options={{ headerShown: false }} />
-            <Stack.Screen name="about" options={{ headerShown: false }} />
+            {STACK_SCREENS.map(name => (
+              <Stack.Screen key={name} name={name} options={{ headerShown: false }} />
+            ))}
           </Stack>
           <StatusBar style="auto" />
         </ThemeProvider>
